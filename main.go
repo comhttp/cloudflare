@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 
-	"github.com/comhttp/jorm/mod/cloudflare"
-	"github.com/comhttp/jorm/mod/coin"
+	"github.com/comhttp/cloudflare/app"
 	"github.com/comhttp/jorm/pkg/cfg"
+	"github.com/comhttp/jorm/pkg/strapi"
 	"github.com/comhttp/jorm/pkg/utl"
 	"github.com/rs/zerolog"
 
@@ -43,7 +43,11 @@ func main() {
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
 	}
 
-	cloudflare.CloudFlare(*config, &coin.CoinsShort{})
+	s := strapi.New(config.Strapi)
+
+	subdomainCoins := s.GetAll("coins", "_where[algo_ne]=&")
+
+	app.CloudFlare(*config, subdomainCoins)
 
 	log.Info().Msg("Starting CloudFlare API...")
 
